@@ -3,7 +3,7 @@
  * Author: German
  *
  * Created on April 5, 2016, 2:37 PM
- */
+ */ 
 #include<xc.h>           // processor SFR definitions
 #include<sys/attribs.h>  // __ISR macro
 
@@ -53,13 +53,20 @@ int main(int argc, char** argv) {
     INTCONbits.MVEC = 0x1;
     DDPCONbits.JTAGEN = 0;
      // do your TRIS and LAT commands here
-    TRISAbits.TRISA4=0;
+    //TRISAbits.TRISA4=1;
+    TRISAbits.TRISA4 = 0;
+    TRISBbits.TRISB4 = 1;
+    
     __builtin_enable_interrupts();
     while(1) {
-        _CP0_SET_COUNT(0);
-        _CP0_GET_COUNT();
-        TRISAbits.TRISA4=0;
-	    // use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
+        if (PORTBbits.RB4)
+        LATAbits.LATA4=1;
+        else
+        LATAbits.LATA4=0;
+            
+	    _CP0_SET_COUNT(0);
+	    _CP0_GET_COUNT();
+        // use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
 		// remember the core timer runs at half the CPU speed
     }
 
