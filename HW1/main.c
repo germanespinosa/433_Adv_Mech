@@ -7,6 +7,8 @@
 #include<xc.h>           // processor SFR definitions
 #include<sys/attribs.h>  // __ISR macro
 
+//#define __delay_ms(x) _delay((unsigned long)((x)*(_XTAL_FREQ/4000.0)))
+
 // DEVCFG0
 #pragma config DEBUG = 0 // no debugging
 #pragma config JTAGEN = OFF // no jtag
@@ -58,14 +60,19 @@ int main(int argc, char** argv) {
     TRISBbits.TRISB4 = 1;
     
     __builtin_enable_interrupts();
+    
     while(1) {
-        if (PORTBbits.RB4)
+        //if (PORTBbits.RB4)
+        //__delay_ms(1000);
+        _CP0_SET_COUNT(0);
         LATAbits.LATA4=1;
-        else
+        //__delay_ms(1000);
+        while (_CP0_GET_COUNT()<12000); 
         LATAbits.LATA4=0;
-            
 	    _CP0_SET_COUNT(0);
-	    _CP0_GET_COUNT();
+        while (_CP0_GET_COUNT()<12000); 
+        //_CP0_SET_COUNT(0);
+	    //_CP0_GET_COUNT();
         // use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing
 		// remember the core timer runs at half the CPU speed
     }
