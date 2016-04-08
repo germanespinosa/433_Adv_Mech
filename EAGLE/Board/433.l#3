@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
+<grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
@@ -53,7 +53,7 @@
 <layer number="90" name="Modules" color="5" fill="1" visible="yes" active="yes"/>
 <layer number="91" name="Nets" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="92" name="Busses" color="1" fill="1" visible="yes" active="yes"/>
-<layer number="93" name="Pins" color="2" fill="1" visible="no" active="yes"/>
+<layer number="93" name="Pins" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="94" name="Symbols" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="95" name="Names" color="7" fill="1" visible="yes" active="yes"/>
 <layer number="96" name="Values" color="7" fill="1" visible="yes" active="yes"/>
@@ -319,6 +319,41 @@ diameter 4 mm, grid 2.54 mm</description>
 <pin name="3" x="2.54" y="0" visible="off" length="point" direction="pas" swaplevel="1" rot="R180"/>
 <pin name="1" x="-2.54" y="0" visible="off" length="point" direction="pas" swaplevel="1"/>
 <pin name="2" x="0" y="-7.62" visible="off" length="point" direction="pas" swaplevel="1" rot="R90"/>
+</symbol>
+<symbol name="PIC32MX250F128B">
+<pin name="P1\" x="-12.7" y="33.02" length="middle"/>
+<pin name="P2" x="-12.7" y="27.94" length="middle"/>
+<pin name="P3" x="-12.7" y="22.86" length="middle"/>
+<pin name="P4" x="-12.7" y="17.78" length="middle"/>
+<pin name="P5" x="-12.7" y="12.7" length="middle"/>
+<pin name="P6" x="-12.7" y="7.62" length="middle"/>
+<pin name="P7" x="-12.7" y="2.54" length="middle"/>
+<pin name="P8" x="-12.7" y="-2.54" length="middle"/>
+<pin name="P9" x="-12.7" y="-7.62" length="middle"/>
+<pin name="P10" x="-12.7" y="-12.7" length="middle"/>
+<pin name="P11" x="-12.7" y="-17.78" length="middle"/>
+<pin name="P12" x="-12.7" y="-22.86" length="middle"/>
+<pin name="P13" x="-12.7" y="-27.94" length="middle"/>
+<pin name="P14" x="-12.7" y="-33.02" length="middle"/>
+<pin name="P15" x="20.32" y="-33.02" length="middle" rot="R180"/>
+<pin name="P16" x="20.32" y="-27.94" length="middle" rot="R180"/>
+<pin name="P17" x="20.32" y="-22.86" length="middle" rot="R180"/>
+<pin name="P18" x="20.32" y="-17.78" length="middle" rot="R180"/>
+<pin name="P19" x="20.32" y="-12.7" length="middle" rot="R180"/>
+<pin name="P20" x="20.32" y="-7.62" length="middle" rot="R180"/>
+<pin name="P21" x="20.32" y="-2.54" length="middle" rot="R180"/>
+<pin name="P22" x="20.32" y="2.54" length="middle" rot="R180"/>
+<pin name="P23" x="20.32" y="7.62" length="middle" rot="R180"/>
+<pin name="P24" x="20.32" y="12.7" length="middle" rot="R180"/>
+<pin name="P25" x="20.32" y="17.78" length="middle" rot="R180"/>
+<pin name="P26" x="20.32" y="22.86" length="middle" rot="R180"/>
+<pin name="P27" x="20.32" y="27.94" length="middle" rot="R180"/>
+<pin name="P28" x="20.32" y="33.02" length="middle" rot="R180"/>
+<wire x1="-10.16" y1="35.56" x2="-10.16" y2="-35.56" width="0.254" layer="94"/>
+<wire x1="-10.16" y1="-35.56" x2="17.78" y2="-35.56" width="0.254" layer="94"/>
+<wire x1="17.78" y1="-35.56" x2="17.78" y2="35.56" width="0.254" layer="94"/>
+<wire x1="17.78" y1="35.56" x2="-10.16" y2="35.56" width="0.254" layer="94"/>
+<text x="2.54" y="10.16" size="1.778" layer="94" rot="R270">PIC32 - MX250F128B</text>
 </symbol>
 </symbols>
 <devicesets>
