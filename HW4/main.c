@@ -52,7 +52,7 @@
 
 
 #define SLAVE_ADDR 0b0100000
-#define SLAVE_REGISTER 0x09
+#define SLAVE_REGISTER 0x0A
 
 
 // send a byte via spi and return the response
@@ -101,7 +101,7 @@ int main(int argc, char** argv) {
             set_voltage(1,i);
             set_voltage(0,(unsigned char) r);
 
-            I2C_send(0b11111111);           // send the slave address, left shifted by 1, 
+            I2C_send(0b10101010);           // send the slave address, left shifted by 1, 
                                                 // which clears bit 0, indicating a write
         }
         else
@@ -109,7 +109,7 @@ int main(int argc, char** argv) {
             set_voltage(0,i);
             set_voltage(1,(unsigned char) r);
 
-            I2C_send(0b00000000);           // send the slave address, left shifted by 1, 
+            I2C_send(0b01010101);           // send the slave address, left shifted by 1, 
                                                 // which clears bit 0, indicating a write
         }
         
