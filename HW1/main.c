@@ -60,17 +60,25 @@ int main(int argc, char** argv) {
     TRISBbits.TRISB4 = 1;
     
     __builtin_enable_interrupts();
-    
+    int t = 24000;
+    int i = 0;
     while(1) {
+        if (PORTBbits.RB4)
+        {
+            i = 22000;
+        }else
+        {
+            i = 3000;
+        }
         //if (PORTBbits.RB4)
         //__delay_ms(1000);
         _CP0_SET_COUNT(0);
         LATAbits.LATA4=1;
         //__delay_ms(1000);
-        while (_CP0_GET_COUNT()<12000); 
+        while (_CP0_GET_COUNT()<(t-i)); 
         LATAbits.LATA4=0;
 	    _CP0_SET_COUNT(0);
-        while (_CP0_GET_COUNT()<12000); 
+        while (_CP0_GET_COUNT()<i); 
         //_CP0_SET_COUNT(0);
 	    //_CP0_GET_COUNT();
         // use _CP0_SET_COUNT(0) and _CP0_GET_COUNT() to test the PIC timing

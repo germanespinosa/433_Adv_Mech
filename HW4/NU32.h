@@ -1,6 +1,7 @@
 #ifndef __NU32_H
 #define __NU32_H
 
+#define _SUPPRESS_PLIB_WARNING 
 #include <plib.h>
 
 #ifdef NU32_STANDALONE              // config bits if not set by bootloader
@@ -20,8 +21,8 @@
 
 #endif // NU32_STANDALONE
 
-#define NU32LED1 LATAbits.LATA4
-#define NU32LED2 LATAbits.LATA5
+//#define NU32LED1 LATAbits.LATA4
+//#define NU32LED2 LATAbits.LATA5
 #define NU32USER PORTDbits.RD13
 #define SYS_FREQ 80000000           // 80 million Hz
 

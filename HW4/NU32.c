@@ -1,5 +1,5 @@
-#include <plib.h>
 #include "NU32.h"
+#include <plib.h>
 
 #define DESIRED_BAUDRATE_NU32 230400 // Baudrate for RS232
 
@@ -18,8 +18,8 @@ void NU32_Startup() {
   DDPCONbits.JTAGEN = 0;
 
   TRISACLR = 0x0030; // Make A5 and A4 outputs (L2 and L1 on the silkscreen)
-  NU32LED1 = 1; // L1 is off
-  NU32LED2 = 0; // L2 is on
+  //NU32LED1 = 1; // L1 is off
+  //NU32LED2 = 0; // L2 is on
 
   // turn on UART1 without an interrupt
   U1MODEbits.BRGH = 0; // set baudrate to DESIRED_BAUDRATE_NU32
@@ -52,14 +52,16 @@ void NU32_EnableUART1Interrupt(void) {
   U1MODEbits.UEN = 2;
 
   // Clear the RX interrupt Flag
-  IFS0bits.U1RXIF = 0;
+  
+  //IFS0bits.U1RXIF = 0; // HERE!!
 
   // Configure UART1 RX Interrupt
   // configure RX to interrupt whenever a character arrives
   U1STAbits.URXISEL = 0;
-  IPC6bits.U1IP = 2;
-  IPC6bits.U1IS = 0;
-  IEC0bits.U1RXIE = 1;
+
+  //IPC6bits.U1IP = 2; // HERE!!
+  //IPC6bits.U1IS = 0; // HERE!!
+  //IEC0bits.U1RXIE = 1; // HERE!!
   
   // turn on the UART
   U1MODEbits.ON = 1;
@@ -71,7 +73,7 @@ void NU32_DisableUART1Interrupt(void) {
   U1MODEbits.ON = 0;
 
   // Configure UART1 RX Interrupt to off
-  IEC0bits.U1RXIE = 0;
+  //IEC0bits.U1RXIE = 0; // HERE!!
 
   // turn on UART1 without an interrupt
   U1MODEbits.BRGH = 0; // set baudrate to DESIRED_BAUDRATE_NU32
