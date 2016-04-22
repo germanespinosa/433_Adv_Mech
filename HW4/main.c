@@ -50,76 +50,20 @@
 #pragma config FUSBIDIO = ON // USB pins controlled by USB module
 #pragma config FVBUSONIO = ON // USB BUSON controlled by USB module
 
-/*
- * 
- */
 
-#define CS LATAbits.LATA0       // chip select pin
+#define SLAVE_ADDR 0b0100000
+#define SLAVE_REGISTER 0x09
 
-#define NU32USER PORTDbits.RD13
-#define SYS_FREQ 80000000           // 80 million Hz
-
-#define DESIRED_BAUDRATE_NU32 230400 // Baudrate for RS232
 
 // send a byte via spi and return the response
 
-
-unsigned char spi_io(unsigned char o) {
-  SPI1BUF = o;
-  while(!SPI1STATbits.SPIRBF) { // wait to receive the byte
-    ;
-  }
-  return SPI1BUF;
-}
-
-// write len bytes to the ram, starting at the address addr
-unsigned short spi_io_short(unsigned short o) {
-  unsigned short b = spi_io((o & 0xFF00) >> 8 ); // most significant byte of address
-  return (b << 8) + spi_io(o & 0x00FF);          // the least significant address byte
-}
-
-// initialize spi1 
-void init_spi() {
-  // set up the chip select pin as an output
-  // when a command is beginning (clear CS to low) and when it
-  // is ending (set CS high)
-  TRISAbits.TRISA0 = 0; // sets A0 for output
-  RPB15Rbits.RPB15R = 0b0101;  // assigns clock to pin 15 
-  RPA1Rbits.RPA1R = 0b0011;    // assigns  SDO1 to pin A1
-  CS = 1;
-
-  // Master - SPI4, pins are: SDI4(F4), SDO4(F5), SCK4(F13).  
-  // we manually control SS4 as a digital output (F12)
-  // since the pic is just starting, we know that spi is off. We rely on defaults here
-  
-  // setup spi4
-//  SPI1CON = 0;              // turn off the spi module and reset it
-//  SPI1BUF = 0;              // clear the rx buffer by reading from it
-
-//  SPI1CON = 0x3;            // turn off the spi module and reset it
-//  SPI1BRG = 0x3;            // baud rate to 10 MHz [SPI4BRG = (80000000/(2*desired))-1]
-//  SPI1STATbits.SPIROV = 0;  // clear the overflow bit
-  SPI1CONbits.CKE = 1;      // data changes when clock goes from hi to lo (since CKP is 0)
-  SPI1CONbits.MSTEN = 1;    // master operation
-  SPI1CONbits.ON = 1;       // turn on spi 1
-
-  //SPI1CON = 0;              // turn off the spi module and reset it
-}
-
 void set_voltage (unsigned short channel, unsigned char voltage)
 {
-    CS = 0;                   // finish the command
-    unsigned short o0= 0b0011000000000000;
+    unsigned short o= 0b0011000000000000;
     //unsigned short o2= 0b0011111111110000;
-    channel = (channel && 1) << 15;
-    /*    unsigned short o0; //= 0b0011000000000000;
-    o0 = (channel && 1) << 15;
-    o0 += 0 << 14;
-    o0 += 1 << 13;
-    o0 += 1 << 12;*/
-    o0 += voltage << 4;
-    spi_io_short(channel + o0);
-    CS = 1;                   // finish the command
+    o += (channel && 1) << 15;
+    o += voltage << 4;
+    SPI_io_short(o);
 }
 
 int main(int argc, char** argv) {
@@ -129,29 +73,47 @@ int main(int argc, char** argv) {
     INTCONbits.MVEC = 0x1;
     DDPCONbits.JTAGEN = 0;
      // do your TRIS and LAT commands here
-    
+
+    unsigned char master_write0 = 0xCD;       // first byte that master writes
+    unsigned char master_write1 = 0x91;       // second byte that master writes
+    unsigned char master_read0  = 0x00;       // first received byte
+    unsigned char master_read1  = 0x00;       // second received byte
+  
     TRISAbits.TRISA4 = 0;
     TRISBbits.TRISB4 = 1;
     
     __builtin_enable_interrupts();
-    //NU32_Startup();
-    init_spi();
+    SPI_init();
+    I2C_init();
     unsigned char i=0;
     while(1) {
+
+        I2C_start();                     // Begin the start sequence
+        I2C_send(SLAVE_ADDR << 1);       // send the slave address, left shifted by 1, 
+                                         // which clears bit 0, indicating a write
+
+        I2C_send(SLAVE_REGISTER);       // send the slave address, left shifted by 1, 
+                                        // which clears bit 0, indicating a write
         i++;
         float r = (sin( (float)i /255 * 6.28 ) * 128) + 127;
         if (PORTBbits.RB4)
         {
             set_voltage(1,i);
             set_voltage(0,(unsigned char) r);
+
+            I2C_send(0b11111111);           // send the slave address, left shifted by 1, 
+                                                // which clears bit 0, indicating a write
         }
         else
         {
             set_voltage(0,i);
             set_voltage(1,(unsigned char) r);
+
+            I2C_send(0b00000000);           // send the slave address, left shifted by 1, 
+                                                // which clears bit 0, indicating a write
         }
         
+        I2C_stop();                   // send a RESTART so we can begin reading 
     }
-    CS = 0;
     return (EXIT_SUCCESS);
 }
