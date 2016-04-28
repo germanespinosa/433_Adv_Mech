@@ -79,15 +79,15 @@ int main(int argc, char** argv) {
     unsigned char i=0;
     _CP0_SET_COUNT(0);
     LATAbits.LATA4 = 0;
-
+/*
     i2c_master_start();                     // Begin the start sequence
     i2c_master_send(PINEX_SLAVE_ADDR_WRITE);
     i2c_master_send(0x00); // OLAT
     i2c_master_send(0b00000000); 
     i2c_master_stop();
-    
+*/  
     unsigned char b = 0 ;
-    unsigned char o;
+    unsigned char o = 0;
     //
     
     //I2C_read_multiple(IMU_SLAVE_ADDR_READ, 0x0F, &o, 1);
@@ -109,14 +109,37 @@ int main(int argc, char** argv) {
 
             _CP0_SET_COUNT(0);
         }
-        i2c_master_start();                     // Begin the start sequence
-        i2c_master_send(IMU_SLAVE_ADDR_READ);
-        i2c_master_send(0x0F); //WHOAMI
-        o=i2c_master_recv(); 
-        i2c_master_ack(1);
-        i2c_master_stop();
-//        if (o==0b01101001)
-//            t= 4000000;
     }
+    i2c_master_start();                     // Begin the start sequence
+    i2c_master_send(IMU_SLAVE_ADDR_WRITE);
+    i2c_master_send(0x0F); //WHOAMI
+    i2c_master_restart(); 
+    i2c_master_send(IMU_SLAVE_ADDR_READ);
+    o=i2c_master_recv(); 
+    i2c_master_ack(1);
+    i2c_master_stop();
+
+    while (!PORTBbits.RB4)
+    {
+        ;
+    }
+    while (1)
+    {
+        i2c_master_start();                     // Begin the start sequence
+        i2c_master_send(PINEX_SLAVE_ADDR_WRITE);
+        i2c_master_send(0x0A); // OLAT
+        i2c_master_send(o); 
+        i2c_master_stop();        
+        if (_CP0_GET_COUNT()>t)
+        {
+            if (i)
+                i=0;
+            else
+                i=1;
+            LATAbits.LATA4 = i;
+            _CP0_SET_COUNT(0);
+        }
+    }
+
     return (EXIT_SUCCESS);
 }

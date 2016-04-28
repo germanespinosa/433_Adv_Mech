@@ -41,7 +41,20 @@ void i2c_master_send(unsigned char byte) { // send a byte to slave
 
 unsigned char i2c_master_recv(void) { // receive a byte from the slave
     I2C2CONbits.RCEN = 1;             // start receiving data
-    while(!I2C2STATbits.RBF) { ; }    // wait to receive the data
+    long t = 800000; 
+    unsigned char i=0;
+    unsigned char b = 0 ;
+    while(!I2C2STATbits.RBF) { 
+        if (_CP0_GET_COUNT()>t)
+        {
+            if (i)
+                i=0;
+            else
+                i=1;
+            LATAbits.LATA4 = i;
+            _CP0_SET_COUNT(0);
+        }
+    }    // wait to receive the data
     return I2C2RCV;                   // read and return the data
 }
 
@@ -62,10 +75,11 @@ void I2C_read_multiple(char address, char reg, unsigned char *data, char length)
     return;
     unsigned char i=0;
     i2c_master_start();                     // Begin the start sequence
-    i2c_master_send(address);
+    i2c_master_send(address<<1); //write
     i2c_master_send(reg); // OLAT
-//    i2c_master_restart();
-    i2c_master_stop();
+    i2c_master_restart();
+    i2c_master_send(address<<1 | 1); //read
+    
     for (i=0;i<length;i++)
     {
         *(data+i)= i2c_master_recv();
