@@ -108,6 +108,11 @@ int main(int argc, char** argv) {
                 b=1;
 
             _CP0_SET_COUNT(0);
+            i2c_master_start();                     // Begin the start sequence
+            i2c_master_send(PINEX_SLAVE_ADDR_WRITE);
+            i2c_master_send(0x0A); // OLAT
+            i2c_master_send(b); 
+            i2c_master_stop();                
         }
     }
     i2c_master_start();                     // Begin the start sequence
