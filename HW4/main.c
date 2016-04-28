@@ -98,8 +98,6 @@ int main(int argc, char** argv) {
     unsigned char b = 0 ;
     unsigned char o;
     //
-    
-    I2C_read_multiple(IMU_SLAVE_ADDR_READ, 0x0F, &o, 1);
     long t = 8000000; 
     if (o==0b01101001)
         t= 4000000;

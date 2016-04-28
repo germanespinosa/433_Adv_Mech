@@ -51,12 +51,164 @@
 
 
 #define PINEX_SLAVE_ADDR_WRITE 0b01000010 // device addr 0100+ A0A1A2 100+ 0 Write 
+#define IMU_SLAVE_ADDR 0b1101011 // device addr  
 #define IMU_SLAVE_ADDR_WRITE 0b11010110 // device addr + 0 Write 
 #define IMU_SLAVE_ADDR_READ 0b11010111 // device addr + 1 Read 
 
+#define IMU_REG_OUT_TEMP_L 0x20
+#define IMU_REG_OUTX_L_G 0x22
+#define IMU_REG_OUTX_L_XL 0x28
+#define IMU_REG_WHOAMI 0x0F
+#define IMU_REG_CTRL1_XL 0x10
+#define IMU_REG_CTRL2_G 0x11
+#define IMU_REG_CTRL3_C 0x11
+
+#define IMU_INIT_ACC 0b10000000
+#define IMU_INIT_GYR 0b10000010
+#define IMU_INIT_CTR 0b00000100
 
 unsigned char i2cData[4] = {0x98,0x01,0xAA};
 
+
+// Reads the 3 accelerometer channels and stores them in vector a
+void readTemp(short *t)
+{
+  unsigned char data[2];
+  I2C_read_multiple(IMU_SLAVE_ADDR, IMU_REG_OUT_TEMP_L, data, 2);
+  
+  unsigned char xla = data[0];
+  unsigned char xha = data[1];
+
+  // combine high and low bytes
+  *t = (short)(xha << 8 | xla);
+}
+
+// Reads the 3 accelerometer channels and stores them in vector a
+void readAcc(short *x, short *y, short *z)
+{
+  unsigned char data[6];
+  I2C_read_multiple(IMU_SLAVE_ADDR, IMU_REG_OUTX_L_XL, data, 6);
+  
+  unsigned char xla = data[0];
+  unsigned char xha = data[1];
+  unsigned char yla = data[2];
+  unsigned char yha = data[3];
+  unsigned char zla = data[4];
+  unsigned char zha = data[5];
+
+  // combine high and low bytes
+  *x = (short)(xha << 8 | xla);
+  *y = (short)(yha << 8 | yla);
+  *z = (short)(zha << 8 | zla);
+}
+
+void readGyro(short *x, short *y, short *z)
+{
+  unsigned char data[6];
+  I2C_read_multiple(IMU_SLAVE_ADDR, IMU_REG_OUTX_L_G, data, 6);
+
+  unsigned char xlg = data[0];
+  unsigned char xhg = data[1];
+  unsigned char ylg = data[2];
+  unsigned char yhg = data[3];
+  unsigned char zlg = data[4];
+  unsigned char zhg = data[5];
+
+  // combine high and low bytes
+  *x = (short)(xhg << 8 | xlg);
+  *y = (short)(yhg << 8 | ylg);
+  *z = (short)(zhg << 8 | zlg);
+}
+void start_imu()
+{
+    i2c_master_start();                     // Begin the start sequence
+    i2c_master_send(IMU_SLAVE_ADDR_WRITE);
+    i2c_master_send(IMU_REG_CTRL1_XL); // OLAT
+    i2c_master_send(IMU_INIT_ACC); 
+    i2c_master_stop();
+    i2c_master_start();                     // Begin the start sequence
+    i2c_master_send(IMU_SLAVE_ADDR_WRITE);
+    i2c_master_send(IMU_REG_CTRL2_G); // OLAT
+    i2c_master_send(IMU_INIT_GYR); 
+    i2c_master_stop();
+    i2c_master_start();                     // Begin the start sequence
+    i2c_master_send(IMU_SLAVE_ADDR_WRITE);
+    i2c_master_send(IMU_REG_CTRL3_C); // OLAT
+    i2c_master_send(IMU_INIT_CTR); 
+    i2c_master_stop();    
+}
+
+int main(int argc, char** argv) {
+    __builtin_mtc0(_CP0_CONFIG, _CP0_CONFIG_SELECT, 0xa4210583);
+    BMXCONbits.BMXWSDRM = 0x0;
+    INTCONbits.MVEC = 0x1;
+    DDPCONbits.JTAGEN = 0;
+     // do your TRIS and LAT commands here
+
+    TRISAbits.TRISA4 = 0;
+    TRISBbits.TRISB4 = 1;
+    
+    //SPI_init();
+    //I2C_init();
+    __builtin_disable_interrupts();
+    __builtin_mtc0(_CP0_CONFIG, _CP0_CONFIG_SELECT, 0xa4210583);
+    BMXCONbits.BMXWSDRM = 0x0;
+    INTCONbits.MVEC = 0x1;
+    DDPCONbits.JTAGEN = 0;
+    i2c_master_setup();                       // init I2C2, which we use as a master
+    __builtin_enable_interrupts();
+    unsigned char i=0;
+    LATAbits.LATA4 = 0;
+    
+    i2c_master_start();                     // Begin the start sequence
+    i2c_master_send(PINEX_SLAVE_ADDR_WRITE);
+    i2c_master_send(0x00); // OLAT
+    i2c_master_send(0b00000000); 
+    i2c_master_stop();
+    _CP0_SET_COUNT(0);
+    while (_CP0_GET_COUNT()<1000000){;}
+    
+    unsigned char o = 0;
+    I2C_read_multiple(IMU_SLAVE_ADDR, IMU_REG_WHOAMI,  &o, 1);
+    
+    start_imu();
+    
+    short x,y,z;
+    short x_e,y_e,z_e;
+    readAcc(&x_e,&y_e,&z_e);
+    int x_f=0;
+    unsigned char n;
+    while (1)
+    {
+        i2c_master_start();                     // Begin the start sequence
+        i2c_master_send(PINEX_SLAVE_ADDR_WRITE);
+        i2c_master_send(0x0A); // OLAT
+        i2c_master_send(o); 
+        i2c_master_stop();
+        _CP0_SET_COUNT(0);
+        while (_CP0_GET_COUNT()<1000000){;}
+        n=3;
+        readAcc(&x,&y,&z);
+        x_f=x-x_e;
+        unsigned char dif=0;
+        if (abs(x_f)>200)
+            dif++;
+        if (abs(x_f)>400)
+            dif++;
+        if (abs(x_f)>60.0)
+            dif++;
+        if (x_f>0)
+            n+=dif;
+        else
+            n-=dif;
+        o=1 << n;
+    }    
+    return (EXIT_SUCCESS);
+}
+
+
+
+/*
 int main(int argc, char** argv) {
     __builtin_mtc0(_CP0_CONFIG, _CP0_CONFIG_SELECT, 0xa4210583);
     BMXCONbits.BMXWSDRM = 0x0;
@@ -79,72 +231,71 @@ int main(int argc, char** argv) {
     unsigned char i=0;
     _CP0_SET_COUNT(0);
     LATAbits.LATA4 = 0;
-/*
-    i2c_master_start();                     // Begin the start sequence
-    i2c_master_send(PINEX_SLAVE_ADDR_WRITE);
-    i2c_master_send(0x00); // OLAT
-    i2c_master_send(0b00000000); 
-    i2c_master_stop();
-*/  
+
     unsigned char b = 0 ;
-    unsigned char o = 0;
-    //
+    unsigned char o = 55;
     
-    //I2C_read_multiple(IMU_SLAVE_ADDR_READ, 0x0F, &o, 1);
-    long t = 8000000; 
-    while (PORTBbits.RB4)
-    {
-        if (_CP0_GET_COUNT()>t)
-        {
-            if (i)
-                i=0;
-            else
-                i=1;
-            LATAbits.LATA4 = i;
 
-            if (b)
-                b = b << 1;
-            else
-                b=1;
+    I2C_read_multiple(IMU_SLAVE_ADDR, WHOAMI,  &o, 1);
 
-            _CP0_SET_COUNT(0);
-            i2c_master_start();                     // Begin the start sequence
-            i2c_master_send(PINEX_SLAVE_ADDR_WRITE);
-            i2c_master_send(0x0A); // OLAT
-            i2c_master_send(b); 
-            i2c_master_stop();                
-        }
-    }
-    i2c_master_start();                     // Begin the start sequence
+    i2c_master_start();  // Begin the start sequence
     i2c_master_send(IMU_SLAVE_ADDR_WRITE);
-    i2c_master_send(0x0F); //WHOAMI
+    i2c_master_send(WHOAMI); //WHOAMI
     i2c_master_restart(); 
     i2c_master_send(IMU_SLAVE_ADDR_READ);
     o=i2c_master_recv(); 
     i2c_master_ack(1);
     i2c_master_stop();
 
+    //I2C_read_multiple(IMU_SLAVE_ADDR_READ, 0x0F, &o, 1);
+    i2c_master_start();  // Begin the start sequence
+    i2c_master_send(PINEX_SLAVE_ADDR_WRITE);
+    i2c_master_send(0x0A); // OLAT
+    i2c_master_send(o); 
+    i2c_master_stop();                
+    while (PORTBbits.RB4)
+    {
+        ;
+    }
+
+    short x = 0 , y = 0 , z = 0;
+    
     while (!PORTBbits.RB4)
     {
         ;
     }
     while (1)
     {
-        i2c_master_start();                     // Begin the start sequence
-        i2c_master_send(PINEX_SLAVE_ADDR_WRITE);
-        i2c_master_send(0x0A); // OLAT
-        i2c_master_send(o); 
-        i2c_master_stop();        
-        if (_CP0_GET_COUNT()>t)
+        
+        if (_CP0_GET_COUNT()>4000000)
         {
             if (i)
+            {
+                //readAcc(&x,&y,&z);
+                o=x;
+                i2c_master_start();  // Begin the start sequence
+                i2c_master_send(PINEX_SLAVE_ADDR_WRITE);
+                i2c_master_send(0x0A); // OLAT
+                i2c_master_send(0b00001111); 
+                i2c_master_stop();  
                 i=0;
+            }
             else
+            {
+                i2c_master_start();  // Begin the start sequence
+                i2c_master_send(PINEX_SLAVE_ADDR_WRITE);
+                i2c_master_send(0x0A); // OLAT
+                i2c_master_send(0b11110000); 
+                i2c_master_stop();  
                 i=1;
+            }
             LATAbits.LATA4 = i;
             _CP0_SET_COUNT(0);
+
+
         }
     }
 
     return (EXIT_SUCCESS);
 }
+*/

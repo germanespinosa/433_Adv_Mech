@@ -72,21 +72,21 @@ void i2c_master_stop(void) {          // send a STOP:
 
 void I2C_read_multiple(char address, char reg, unsigned char *data, char length)
 {
-    return;
     unsigned char i=0;
     i2c_master_start();                     // Begin the start sequence
-    i2c_master_send(address<<1); //write
-    i2c_master_send(reg); // OLAT
+    i2c_master_send(address << 1 | 0); //write
+    i2c_master_send(reg); 
     i2c_master_restart();
-    i2c_master_send(address<<1 | 1); //read
+    i2c_master_send(address << 1 | 1); //read
     
-    for (i=0;i<length;i++)
+    while (i<length)
     {
-        *(data+i)= i2c_master_recv();
-        if (i+1==length)
+        *data= i2c_master_recv();
+        data++;
+        i++;
+        if (i<length)
             i2c_master_ack(0);
-        else
-            i2c_master_ack(1);
     }
+    i2c_master_ack(1);
     i2c_master_stop();
 }
