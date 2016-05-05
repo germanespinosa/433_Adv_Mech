@@ -1,0 +1,33 @@
+build/pic32mx_usb_sk2_int_dyn/production/_ext/1344078309/bsp_sys_init.o:  \
+ C:/microchip/harmony/v1_07_01/bsp/pic32mx_usb_sk2/bsp_sys_init.c  \
+ C:/microchip/harmony/v1_07_01/bsp/pic32mx_usb_sk2/bsp_config.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/plib_ports.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/ports_processor.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/ports_p32xxxx.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/ports_p32mx250f128b.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/peripheral_common_32bit.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/peripheral_common.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/../templates/ports_RemapInput_default.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/../templates/ports_RemapOutput_PIC32_2.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/../templates/ports_PinMode_PPS.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/../templates/ports_AnPinsMode_Unsupported.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/../templates/ports_PortsRead_MCU32_PPS.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/../templates/ports_LatchRead_MCU32_PPS.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/../templates/ports_PortsWrite_MCU32_PPS.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/../templates/ports_PortsDirection_MCU32_PPS.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/../templates/ports_PortsOpenDrain_MCU32_PPS.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/../templates/ports_ChangeNotice_Unsupported.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/../templates/ports_PinChangeNotice_Unsupported.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/../templates/ports_ChangeNoticeInIdle_Unsupported.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/../templates/ports_ChangeNoticePullup_Unsupported.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/../templates/ports_PinModePerPort_Default.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/../templates/ports_ChangeNoticePullDownPerPort_Default.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/../templates/ports_ChangeNoticePullUpPerPort_Default.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/../templates/ports_PinChangeNoticePerPort_Default.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/../templates/ports_ChangeNoticePerPortTurnOn_Default.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/../templates/ports_ChangeNoticeInIdlePerPort_Default.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/../templates/ports_ChangeNoticePerPortStatus_Default.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/../templates/ports_SlewRateControl_Unsupported.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/../templates/ports_ChannelChangeNoticeMethod_Unsupported.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/../templates/ports_ChangeNoticeEdgeControl_Unsupported.h  \
+ C:/microchip/harmony/v1_07_01/framework/peripheral/ports/processor/../templates/ports_ChangeNoticeEdgeStatus_Unsupported.h 
