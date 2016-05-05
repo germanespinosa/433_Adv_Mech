@@ -52,9 +52,8 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // Section: Included Files 
 // *****************************************************************************
 // *****************************************************************************
-
 #include "app.h"
-
+#include "i2c.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -77,11 +76,63 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
     Application strings and buffers are be defined outside this structure.
 */
 
+
+#define IMU_SLAVE_ADDR 0b1101011 // device addr  
+#define IMU_SLAVE_ADDR_WRITE 0b11010110 // device addr + 0 Write 
+#define IMU_SLAVE_ADDR_READ 0b11010111 // device addr + 1 Read 
+
+#define IMU_REG_OUT_TEMP_L 0x20
+#define IMU_REG_OUTX_L_G 0x22
+#define IMU_REG_OUTX_L_XL 0x28
+#define IMU_REG_WHOAMI 0x0F
+#define IMU_REG_CTRL1_XL 0x10
+#define IMU_REG_CTRL2_G 0x11
+#define IMU_REG_CTRL3_C 0x11
+
+#define IMU_INIT_ACC 0b10000000
+#define IMU_INIT_GYR 0b10000010
+#define IMU_INIT_CTR 0b00000100
+
 APP_DATA appData;
 
 /* Mouse Report */
 MOUSE_REPORT mouseReport APP_MAKE_BUFFER_DMA_READY;
 MOUSE_REPORT mouseReportPrevious APP_MAKE_BUFFER_DMA_READY;
+
+void readAcc(short *x, short *y, short *z)
+{
+  unsigned char data[6];
+  I2C_read_multiple(IMU_SLAVE_ADDR, IMU_REG_OUTX_L_XL, data, 6);
+  
+  unsigned char xla = data[0];
+  unsigned char xha = data[1];
+  unsigned char yla = data[2];
+  unsigned char yha = data[3];
+  unsigned char zla = data[4];
+  unsigned char zha = data[5];
+
+  // combine high and low bytes
+  *x = (short)(xha << 8 | xla);
+  *y = (short)(yha << 8 | yla);
+  *z = (short)(zha << 8 | zla);
+}
+
+int8_t convert_to_m (short v)
+{
+    int8_t dif=0;
+    if (abs(v)>400)
+        dif++;
+    if (abs(v)>600)
+        dif++;
+    if (abs(v)>800)
+        dif++;
+    if (abs(v)>1000)
+        dif++;
+    if (v>0)
+        return dif;
+    else
+        return -dif;
+}
 
 
 // *****************************************************************************
@@ -303,6 +354,24 @@ void APP_ProcessSwitchPress(void)
     }
 }
 
+void start_imu()
+{
+    i2c_master_start();                     // Begin the start sequence
+    i2c_master_send(IMU_SLAVE_ADDR_WRITE);
+    i2c_master_send(IMU_REG_CTRL1_XL); // OLAT
+    i2c_master_send(IMU_INIT_ACC); 
+    i2c_master_stop();
+    i2c_master_start();                     // Begin the start sequence
+    i2c_master_send(IMU_SLAVE_ADDR_WRITE);
+    i2c_master_send(IMU_REG_CTRL2_G); // OLAT
+    i2c_master_send(IMU_INIT_GYR); 
+    i2c_master_stop();
+    i2c_master_start();                     // Begin the start sequence
+    i2c_master_send(IMU_SLAVE_ADDR_WRITE);
+    i2c_master_send(IMU_REG_CTRL3_C); // OLAT
+    i2c_master_send(IMU_INIT_CTR); 
+    i2c_master_stop();    
+}
 
 // *****************************************************************************
 // *****************************************************************************
@@ -330,6 +399,11 @@ void APP_Initialize ( void )
     appData.isMouseReportSendBusy = false;
     appData.isSwitchPressed = false;
     appData.ignoreSwitchPress = false;
+    __builtin_disable_interrupts();
+    __builtin_mtc0(_CP0_CONFIG, _CP0_CONFIG_SELECT, 0xa4210583);
+    i2c_master_setup();                       // init I2C2, which we use as a master
+    __builtin_enable_interrupts();
+    start_imu();    
 }
 
 
@@ -346,8 +420,7 @@ void APP_Tasks ( void )
     static int8_t   vector = 0;
     static uint8_t  movement_length = 0;
     static bool     sent_dont_move = false;
-
-    int8_t dir_table[] ={-4,-4,-4, 0, 4, 4, 4, 0};
+    short mx=0,my=0,mz=0;
 	
     /* Check the application's current state. */
     switch ( appData.state )
@@ -409,8 +482,11 @@ void APP_Tasks ( void )
                 {
                     appData.mouseButton[0] = MOUSE_BUTTON_STATE_RELEASED;
                     appData.mouseButton[1] = MOUSE_BUTTON_STATE_RELEASED;
-                    appData.xCoordinate =(int8_t)dir_table[vector & 0x07] ;
-                    appData.yCoordinate =(int8_t)dir_table[(vector+2) & 0x07];
+
+                    readAcc(&mx, &my, &mz);
+                    
+                    appData.xCoordinate = convert_to_m(mx) ;
+                    appData.yCoordinate = convert_to_m(my);
                     vector ++;
                     movement_length = 0;
                 }
