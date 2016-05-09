@@ -132,13 +132,13 @@ void readAcc(short *x, short *y, short *z)
 int8_t convert_to_m (short v)
 {
     int8_t dif=0;
+    if (abs(v)>500)
+        dif++;
     if (abs(v)>1000)
         dif++;
     if (abs(v)>1500)
         dif++;
     if (abs(v)>2000)
-        dif++;
-    if (abs(v)>2500)
         dif++;
     if (v>0)
         return dif;
@@ -402,6 +402,21 @@ void start_imu()
 void APP_Initialize ( void )
 {
     /* Place the App state machine in its initial state. */
+    TRISAbits.TRISA4 = 0;
+    TRISBbits.TRISB4 = 1;
+    
+    //SPI_init();
+    //I2C_init();
+    __builtin_disable_interrupts();
+    __builtin_mtc0(_CP0_CONFIG, _CP0_CONFIG_SELECT, 0xa4210583);
+    BMXCONbits.BMXWSDRM = 0x0;
+    INTCONbits.MVEC = 0x1;
+    DDPCONbits.JTAGEN = 0;
+    i2c_master_setup();                       // init I2C2, which we use as a master
+    __builtin_enable_interrupts();
+    _CP0_SET_COUNT(0);
+    LATAbits.LATA4 = 0;
+    start_imu();    
     appData.state = APP_STATE_INIT;
     
     appData.deviceHandle  = USB_DEVICE_HANDLE_INVALID;
@@ -411,11 +426,8 @@ void APP_Initialize ( void )
     appData.isMouseReportSendBusy = false;
     appData.isSwitchPressed = false;
     appData.ignoreSwitchPress = false;
-    __builtin_disable_interrupts();
-    __builtin_mtc0(_CP0_CONFIG, _CP0_CONFIG_SELECT, 0xa4210583);
-    i2c_master_setup();                       // init I2C2, which we use as a master
-    __builtin_enable_interrupts();
-    start_imu();    
+
+    
 }
 
 
@@ -431,7 +443,7 @@ MOUSE_BUTTON_STATE is_button_pressed()
     static int pressed = 0;
     if (PORTBbits.RB4==0) 
     {
-        pressed = 100;
+        pressed = 50;
     }
     if (pressed) 
     {
@@ -446,7 +458,7 @@ void APP_Tasks ( void )
     static int8_t   vector = 0;
     static uint8_t  movement_length = 0;
     static bool     sent_dont_move = false;
-    short mx=0,my=0,mz=0;
+    short mx=1,my=1,mz=1;
 	
     /* Check the application's current state. */
     switch ( appData.state )
@@ -508,11 +520,33 @@ void APP_Tasks ( void )
                 {
                     appData.mouseButton[0] = is_button_pressed();
                     appData.mouseButton[1] = MOUSE_BUTTON_STATE_RELEASED;
-
-                    readAcc(&mx, &my, &mz);
                     
-                    appData.xCoordinate = convert_to_m(mx) ;
-                    appData.yCoordinate = convert_to_m(my);
+                    readAcc(&mx, &my, &mz);
+                    if (mx==0 && _CP0_GET_COUNT()<4000000)
+                    {
+                        LATAbits.LATA4=1;
+                        _CP0_SET_COUNT(0);
+                    }
+                    else
+                    {
+                        LATAbits.LATA4=0;
+                        if (_CP0_GET_COUNT()<8000000)
+                            _CP0_SET_COUNT(0);
+                            
+                    }
+                    if (appData.mouseButton[0] == MOUSE_BUTTON_STATE_RELEASED)
+                    {
+                        appData.xCoordinate = convert_to_m(mx);
+                        appData.yCoordinate = convert_to_m(my);
+                        LATAbits.LATA4=0;
+                    }
+                    else
+                    {
+                        LATAbits.LATA4=1;
+                        appData.xCoordinate = 0;
+                        appData.yCoordinate = 0;
+                    }
+                        
                     vector ++;
                     movement_length = 0;
                 }
