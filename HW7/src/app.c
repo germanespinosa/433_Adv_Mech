@@ -120,13 +120,13 @@ void readAcc(short *x, short *y, short *z)
 int8_t convert_to_m (short v)
 {
     int8_t dif=0;
-    if (abs(v)>500)
-        dif++;
     if (abs(v)>1000)
         dif++;
     if (abs(v)>1500)
         dif++;
     if (abs(v)>2000)
+        dif++;
+    if (abs(v)>2500)
         dif++;
     if (v>0)
         return dif;

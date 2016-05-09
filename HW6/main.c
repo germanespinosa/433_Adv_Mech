@@ -69,7 +69,6 @@
 
 unsigned char i2cData[4] = {0x98,0x01,0xAA};
 
-
 // Reads the 3 accelerometer channels and stores them in vector a
 void readTemp(short *t)
 {
@@ -86,7 +85,11 @@ void readTemp(short *t)
 // Reads the 3 accelerometer channels and stores them in vector a
 void readAcc(short *x, short *y, short *z)
 {
+  static short error_x= 0, error_y= 0, error_z= 0;
+  static int error_sample =0;
+
   unsigned char data[6];
+  
   I2C_read_multiple(IMU_SLAVE_ADDR, IMU_REG_OUTX_L_XL, data, 6);
   
   unsigned char xla = data[0];
@@ -97,13 +100,23 @@ void readAcc(short *x, short *y, short *z)
   unsigned char zha = data[5];
 
   // combine high and low bytes
-  *x = (short)(xha << 8 | xla);
-  *y = (short)(yha << 8 | yla);
-  *z = (short)(zha << 8 | zla);
+  *x = (short)(xha << 8 | xla) - error_x;
+  *y = (short)(yha << 8 | yla) - error_y;
+  *z = (short)(zha << 8 | zla) - error_z;
+  if (error_sample < 50)
+  {
+      error_x = (error_x * error_sample + *x) / (error_sample + 1);
+      error_y = (error_y * error_sample + *y) / (error_sample + 1);
+      error_z = (error_z * error_sample + *z) / (error_sample + 1);
+      error_sample++;
+  }
 }
 
 void readGyro(short *x, short *y, short *z)
 {
+  static short error_x= 0, error_y= 0, error_z= 0;
+  static int error_sample = 0;
+    
   unsigned char data[6];
   I2C_read_multiple(IMU_SLAVE_ADDR, IMU_REG_OUTX_L_G, data, 6);
 
@@ -115,9 +128,16 @@ void readGyro(short *x, short *y, short *z)
   unsigned char zhg = data[5];
 
   // combine high and low bytes
-  *x = (short)(xhg << 8 | xlg);
-  *y = (short)(yhg << 8 | ylg);
-  *z = (short)(zhg << 8 | zlg);
+  *x = (short)(xhg << 8 | xlg) - error_x;
+  *y = (short)(yhg << 8 | ylg) - error_y;
+  *z = (short)(zhg << 8 | zlg) - error_z;
+  if (error_sample < 50)
+  {
+      error_x = (error_x * error_sample + *x) / (error_sample + 1);
+      error_y = (error_y * error_sample + *y) / (error_sample + 1);
+      error_z = (error_z * error_sample + *z) / (error_sample + 1);
+      error_sample++;
+  }  
 }
 void start_imu()
 {
@@ -191,17 +211,17 @@ int main(int argc, char** argv) {
         readAcc(&x,&y,&z);
         x_f=x-x_e;
         unsigned char dif=0;
-        if (abs(x_f)>200)
-            dif++;
         if (abs(x_f)>400)
             dif++;
-        if (abs(x_f)>60.0)
+        if (abs(x_f)>600)
+            dif++;
+        if (abs(x_f)>800)
             dif++;
         if (x_f>0)
             n+=dif;
         else
             n-=dif;
-        o=1 << n;
+        o=3 << n;
     }    
     return (EXIT_SUCCESS);
 }
