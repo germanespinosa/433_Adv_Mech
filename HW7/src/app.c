@@ -99,9 +99,14 @@ APP_DATA appData;
 MOUSE_REPORT mouseReport APP_MAKE_BUFFER_DMA_READY;
 MOUSE_REPORT mouseReportPrevious APP_MAKE_BUFFER_DMA_READY;
 
+// Reads the 3 accelerometer channels and stores them in vector a
 void readAcc(short *x, short *y, short *z)
 {
+  static short error_x= 0, error_y= 0, error_z= 0;
+  static int error_sample =0;
+
   unsigned char data[6];
+  
   I2C_read_multiple(IMU_SLAVE_ADDR, IMU_REG_OUTX_L_XL, data, 6);
   
   unsigned char xla = data[0];
@@ -112,9 +117,16 @@ void readAcc(short *x, short *y, short *z)
   unsigned char zha = data[5];
 
   // combine high and low bytes
-  *x = (short)(xha << 8 | xla);
-  *y = (short)(yha << 8 | yla);
-  *z = (short)(zha << 8 | zla);
+  *x = (short)(xha << 8 | xla) - error_x;
+  *y = (short)(yha << 8 | yla) - error_y;
+  *z = (short)(zha << 8 | zla) - error_z;
+  if (error_sample < 50)
+  {
+      error_x = (error_x * error_sample + *x) / (error_sample + 1);
+      error_y = (error_y * error_sample + *y) / (error_sample + 1);
+      error_z = (error_z * error_sample + *z) / (error_sample + 1);
+      error_sample++;
+  }
 }
 
 int8_t convert_to_m (short v)
@@ -414,6 +426,20 @@ void APP_Initialize ( void )
   Remarks:
     See prototype in app.h.
  */
+MOUSE_BUTTON_STATE is_button_pressed()
+{
+    static int pressed = 0;
+    if (PORTBbits.RB4==0) 
+    {
+        pressed = 100;
+    }
+    if (pressed) 
+    {
+        pressed--;
+        return MOUSE_BUTTON_STATE_PRESSED;
+    }
+    return MOUSE_BUTTON_STATE_RELEASED;
+}
 
 void APP_Tasks ( void )
 {
@@ -480,7 +506,7 @@ void APP_Tasks ( void )
 
                 if(movement_length > 50)
                 {
-                    appData.mouseButton[0] = MOUSE_BUTTON_STATE_RELEASED;
+                    appData.mouseButton[0] = is_button_pressed();
                     appData.mouseButton[1] = MOUSE_BUTTON_STATE_RELEASED;
 
                     readAcc(&mx, &my, &mz);
