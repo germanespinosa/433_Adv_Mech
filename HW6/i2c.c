@@ -1,16 +1,6 @@
 #include<xc.h>           // processor SFR definitions
-#define _SUPPRESS_PLIB_WARNING 
-#define _DISABLE_OPENADC10_CONFIGPORT_WARNING
-#include <plib.h>
-// I2C Master utilities, 100 kHz, using polling rather than interrupts
-// The functions must be callled in the correct order as per the I2C protocol
-// Change I2C2 to the I2C channel you are using
-// I2C pins need pull-up resistors, 2k-10k
+#include "i2c.h" 
 
-#define SYS_FREQ    (24000000)
-#define PBCLK       (SYS_FREQ/2)
-#define Fsck        26000
-#define BRG_VAL     (PBCLK/2/Fsck)
 
 void i2c_master_setup(void) {
   ANSELB = 0;

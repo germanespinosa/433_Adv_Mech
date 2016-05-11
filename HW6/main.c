@@ -70,7 +70,35 @@ int main(int argc, char** argv) {
     BMXCONbits.BMXWSDRM = 0x0;
     INTCONbits.MVEC = 0x1;
     DDPCONbits.JTAGEN = 0;
-    i2c_master_setup();                       // init I2C2, which we use as a master
+    unsigned char o=0;
+    start_imu();
+    if (0)//error
+    {
+        while(1)
+        {
+            LATAbits.LATA4=0;
+            _CP0_SET_COUNT(0);
+            while (_CP0_GET_COUNT()<100000000){;}
+            LATAbits.LATA4=1;
+            _CP0_SET_COUNT(0);
+            while (_CP0_GET_COUNT()<100000000){;}
+        }            
+    }else
+    {
+        o = 55;//imu_whoami();
+        if (o==0)
+        {
+            while(1)
+            {
+                LATAbits.LATA4=0;
+                _CP0_SET_COUNT(0);
+                while (_CP0_GET_COUNT()<1000000){;}
+                LATAbits.LATA4=1;
+                _CP0_SET_COUNT(0);
+                while (_CP0_GET_COUNT()<1000000){;}
+            }            
+        }
+    }
     __builtin_enable_interrupts();
     unsigned char i=0;
     LATAbits.LATA4 = 0;
@@ -83,10 +111,6 @@ int main(int argc, char** argv) {
     _CP0_SET_COUNT(0);
     while (_CP0_GET_COUNT()<1000000){;}
     
-    unsigned char o = 0;
-    I2C_read_multiple(IMU_SLAVE_ADDR, IMU_REG_WHOAMI,  &o, 1);
-    
-    start_imu();
     
     short x,y,z;
     short x_e,y_e,z_e;

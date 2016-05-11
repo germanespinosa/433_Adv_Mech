@@ -101,6 +101,7 @@
         <itemPath>../src/app.h</itemPath>
         <itemPath>../src/mouse.h</itemPath>
         <itemPath>../src/i2c.h</itemPath>
+        <itemPath>../src/imu.h</itemPath>
       </logicalFolder>
       <logicalFolder name="bsp" displayName="bsp" projectFiles="true">
         <logicalFolder name="f7" displayName="chipkit_wifire" projectFiles="true">
@@ -330,6 +331,7 @@
         <itemPath>../src/main.c</itemPath>
         <itemPath>../src/mouse.c</itemPath>
         <itemPath>../src/i2c.c</itemPath>
+        <itemPath>../src/imu.c</itemPath>
       </logicalFolder>
       <logicalFolder name="bsp" displayName="bsp" projectFiles="true">
         <logicalFolder name="f7" displayName="chipkit_wifire" projectFiles="true">
@@ -447,6 +449,7 @@
     <Elem>../../../..</Elem>
     <Elem>../src/system_config/pic32mz_da_sk_int_dyn</Elem>
     <Elem>../src/system_config/chipkit_wifire</Elem>
+    <Elem>../../HW6</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -2156,6 +2159,7 @@
         <property key="UART1" value="true"/>
         <property key="UART2" value="true"/>
         <property key="USB" value="true"/>
+        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="true"/>

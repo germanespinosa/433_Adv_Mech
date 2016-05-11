@@ -50,9 +50,8 @@
 #pragma config FVBUSONIO = ON // USB BUSON controlled by USB module
 
 
-#define PINEX_SLAVE_ADDR_WRITE 0b01000010 // device addr 0100+ A0A1A2 100+ 0 Write 
-#define IMU_SLAVE_ADDR_WRITE 0b11010110 // device addr + 0 Write 
-#define IMU_SLAVE_ADDR_READ 0b11010111 // device addr + 1 Read 
+#define PINEX_SLAVE_ADDR1 0b001 // device addr 0100+ A0A1A2 001
+#define PINEX_SLAVE_ADDR2 0b100 // device addr 0100+ A0A1A2 100
 
 void set_voltage (unsigned short channel, unsigned char voltage)
 {
@@ -62,7 +61,6 @@ void set_voltage (unsigned short channel, unsigned char voltage)
     o += voltage << 4;
     SPI_io_short(o);
 }
-
 
 unsigned char i2cData[4] = {0x98,0x01,0xAA};
 
@@ -76,55 +74,70 @@ int main(int argc, char** argv) {
     TRISAbits.TRISA4 = 0;
     TRISBbits.TRISB4 = 1;
     
-    //SPI_init();
-    //I2C_init();
     __builtin_disable_interrupts();
     __builtin_mtc0(_CP0_CONFIG, _CP0_CONFIG_SELECT, 0xa4210583);
     BMXCONbits.BMXWSDRM = 0x0;
     INTCONbits.MVEC = 0x1;
     DDPCONbits.JTAGEN = 0;
-    i2c_master_setup();                       // init I2C2, which we use as a master
     __builtin_enable_interrupts();
     unsigned char i=0;
-    _CP0_SET_COUNT(0);
     LATAbits.LATA4 = 0;
 
-    i2c_master_start();                     // Begin the start sequence
-    i2c_master_send(PINEX_SLAVE_ADDR_WRITE);
-    i2c_master_send(0x00); // OLAT
-    i2c_master_send(0b00000000); 
-    i2c_master_stop();
+    pinexp_start(0b00000000/*all out*/,PINEX_SLAVE_ADDR1);
+    pinexp_start(0b00001111/*all in*/,PINEX_SLAVE_ADDR2);
     
-    unsigned char b = 0 ;
-    unsigned char o;
-    //
-    long t = 8000000; 
-    if (o==0b01101001)
-        t= 4000000;
+    unsigned char o=0;
+
+    _CP0_SET_COUNT(0);
+    while (_CP0_GET_COUNT()<24000000){;}
+    o=pinexp_read(PINEX_SLAVE_ADDR2);
+    pinexp_write(0b11111111,PINEX_SLAVE_ADDR1);
+
+    _CP0_SET_COUNT(0);
+    while (_CP0_GET_COUNT()<24000000){;}
+    pinexp_write(0b00000000,PINEX_SLAVE_ADDR1);
+
+    _CP0_SET_COUNT(0);
+    while (_CP0_GET_COUNT()<24000000){;}
+    pinexp_write(o,PINEX_SLAVE_ADDR1);
+    
+    _CP0_SET_COUNT(0);
+    while (_CP0_GET_COUNT()<24000000){;}
+
+    unsigned short b = 0 ;
+    long t = 1000000; 
+    
+    
     while (PORTBbits.RB4)
     {
         if (_CP0_GET_COUNT()>t)
         {
-            if (i)
-                i=0;
-            else
-                i=1;
-            LATAbits.LATA4 = i;
-
             if (b)
                 b = b << 1;
             else
                 b=1;
+            
+            unsigned char o;
+            o=pinexp_read(PINEX_SLAVE_ADDR2);
 
+            //pinexp_write(b,PINEX_SLAVE_ADDR2);
+
+            pinexp_write(o<<4,PINEX_SLAVE_ADDR2);
+
+            pinexp_write(o,PINEX_SLAVE_ADDR2);
+
+            if ((o & 1) || !b)
+            {
+                LATAbits.LATA4 = 1;
+            }
+            else
+            {
+                LATAbits.LATA4 = 0;
+            }
             _CP0_SET_COUNT(0);
         }
-        i2c_master_start();                     // Begin the start sequence
-        i2c_master_send(PINEX_SLAVE_ADDR_WRITE);
-        i2c_master_send(0x0A); // OLAT
-        i2c_master_send(b); 
-        i2c_master_stop();
     }
-
+/*
     while(1) {
         i++;
         float r = (sin( (float)i /255 * 6.28 ) * 128) + 127;
@@ -144,6 +157,6 @@ int main(int argc, char** argv) {
         LATAbits.LATA4 = 0;
         _CP0_SET_COUNT(0);
         while (_CP0_GET_COUNT()<8000000); 
-    }
+    }*/
     return (EXIT_SUCCESS);
 }

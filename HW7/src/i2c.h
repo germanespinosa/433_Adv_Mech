@@ -11,19 +11,21 @@
 #define Fsck        26000
 #define BRG_VAL     (PBCLK/2/Fsck)
 
+#define TIMEOUT 500000
+
 void i2c_master_setup(void);
 
 // Start a transmission on the I2C bus
-void i2c_master_start(void);
+unsigned i2c_master_start(void);
 
-void i2c_master_restart(void);
+unsigned i2c_master_restart(void);
 
-void i2c_master_send(unsigned char byte);
+unsigned i2c_master_send(unsigned char byte);
 
-unsigned char i2c_master_recv(void);
+unsigned i2c_master_recv(unsigned char *data);
 
-void i2c_master_ack(int val);
+unsigned i2c_master_ack(int val);
 
-void i2c_master_stop(void);
+unsigned i2c_master_stop(void);
 
-void I2C_read_multiple(char address, char reg, unsigned char *data, char length);
+unsigned I2C_read_multiple(char address, char reg, unsigned char *data, unsigned length);

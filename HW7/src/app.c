@@ -53,7 +53,7 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
 // *****************************************************************************
 // *****************************************************************************
 #include "app.h"
-#include "i2c.h"
+#include "imu.h"
 
 // *****************************************************************************
 // *****************************************************************************
@@ -76,58 +76,12 @@ SUBSTITUTE GOODS, TECHNOLOGY, SERVICES, OR ANY CLAIMS BY THIRD PARTIES
     Application strings and buffers are be defined outside this structure.
 */
 
-
-#define IMU_SLAVE_ADDR 0b1101011 // device addr  
-#define IMU_SLAVE_ADDR_WRITE 0b11010110 // device addr + 0 Write 
-#define IMU_SLAVE_ADDR_READ 0b11010111 // device addr + 1 Read 
-
-#define IMU_REG_OUT_TEMP_L 0x20
-#define IMU_REG_OUTX_L_G 0x22
-#define IMU_REG_OUTX_L_XL 0x28
-#define IMU_REG_WHOAMI 0x0F
-#define IMU_REG_CTRL1_XL 0x10
-#define IMU_REG_CTRL2_G 0x11
-#define IMU_REG_CTRL3_C 0x11
-
-#define IMU_INIT_ACC 0b10000000
-#define IMU_INIT_GYR 0b10000010
-#define IMU_INIT_CTR 0b00000100
-
 APP_DATA appData;
 
 /* Mouse Report */
 MOUSE_REPORT mouseReport APP_MAKE_BUFFER_DMA_READY;
 MOUSE_REPORT mouseReportPrevious APP_MAKE_BUFFER_DMA_READY;
 
-// Reads the 3 accelerometer channels and stores them in vector a
-void readAcc(short *x, short *y, short *z)
-{
-  static short error_x= 0, error_y= 0, error_z= 0;
-  static int error_sample =0;
-
-  unsigned char data[6];
-  
-  I2C_read_multiple(IMU_SLAVE_ADDR, IMU_REG_OUTX_L_XL, data, 6);
-  
-  unsigned char xla = data[0];
-  unsigned char xha = data[1];
-  unsigned char yla = data[2];
-  unsigned char yha = data[3];
-  unsigned char zla = data[4];
-  unsigned char zha = data[5];
-
-  // combine high and low bytes
-  *x = (short)(xha << 8 | xla) - error_x;
-  *y = (short)(yha << 8 | yla) - error_y;
-  *z = (short)(zha << 8 | zla) - error_z;
-  if (error_sample < 50)
-  {
-      error_x = (error_x * error_sample + *x) / (error_sample + 1);
-      error_y = (error_y * error_sample + *y) / (error_sample + 1);
-      error_z = (error_z * error_sample + *z) / (error_sample + 1);
-      error_sample++;
-  }
-}
 
 int8_t convert_to_m (short v)
 {
@@ -366,25 +320,6 @@ void APP_ProcessSwitchPress(void)
     }
 }
 
-void start_imu()
-{
-    i2c_master_start();                     // Begin the start sequence
-    i2c_master_send(IMU_SLAVE_ADDR_WRITE);
-    i2c_master_send(IMU_REG_CTRL1_XL); // OLAT
-    i2c_master_send(IMU_INIT_ACC); 
-    i2c_master_stop();
-    i2c_master_start();                     // Begin the start sequence
-    i2c_master_send(IMU_SLAVE_ADDR_WRITE);
-    i2c_master_send(IMU_REG_CTRL2_G); // OLAT
-    i2c_master_send(IMU_INIT_GYR); 
-    i2c_master_stop();
-    i2c_master_start();                     // Begin the start sequence
-    i2c_master_send(IMU_SLAVE_ADDR_WRITE);
-    i2c_master_send(IMU_REG_CTRL3_C); // OLAT
-    i2c_master_send(IMU_INIT_CTR); 
-    i2c_master_stop();    
-}
-
 // *****************************************************************************
 // *****************************************************************************
 // Section: Application Initialization and State Machine Functions
@@ -407,16 +342,24 @@ void APP_Initialize ( void )
     
     //SPI_init();
     //I2C_init();
+    
+    _CP0_SET_COUNT(0);
+    LATAbits.LATA4 = 1;
+    while (_CP0_GET_COUNT()<(6000000));
+    LATAbits.LATA4 = 0;
+    _CP0_SET_COUNT(0);
+    while (_CP0_GET_COUNT()<(6000000));
     __builtin_disable_interrupts();
     __builtin_mtc0(_CP0_CONFIG, _CP0_CONFIG_SELECT, 0xa4210583);
     BMXCONbits.BMXWSDRM = 0x0;
     INTCONbits.MVEC = 0x1;
     DDPCONbits.JTAGEN = 0;
-    i2c_master_setup();                       // init I2C2, which we use as a master
+    LATAbits.LATA4 = 1;
+    if (start_imu() ) LATAbits.LATA4 = 0;
+    
     __builtin_enable_interrupts();
-    _CP0_SET_COUNT(0);
-    LATAbits.LATA4 = 0;
-    start_imu();    
+    
+    
     appData.state = APP_STATE_INIT;
     
     appData.deviceHandle  = USB_DEVICE_HANDLE_INVALID;
@@ -425,11 +368,8 @@ void APP_Initialize ( void )
     appData.hidInstance = 0;
     appData.isMouseReportSendBusy = false;
     appData.isSwitchPressed = false;
-    appData.ignoreSwitchPress = false;
-
-    
+    appData.ignoreSwitchPress = false;   
 }
-
 
 /******************************************************************************
   Function:
@@ -458,7 +398,7 @@ void APP_Tasks ( void )
     static int8_t   vector = 0;
     static uint8_t  movement_length = 0;
     static bool     sent_dont_move = false;
-    short mx=1,my=1,mz=1;
+    //short mx=1,my=1,mz=1;
 	
     /* Check the application's current state. */
     switch ( appData.state )
@@ -521,7 +461,7 @@ void APP_Tasks ( void )
                     appData.mouseButton[0] = is_button_pressed();
                     appData.mouseButton[1] = MOUSE_BUTTON_STATE_RELEASED;
                     
-                    readAcc(&mx, &my, &mz);
+                    /*readAcc(&mx, &my, &mz);
                     if (mx==0 && _CP0_GET_COUNT()<4000000)
                     {
                         LATAbits.LATA4=1;
@@ -533,11 +473,14 @@ void APP_Tasks ( void )
                         if (_CP0_GET_COUNT()<8000000)
                             _CP0_SET_COUNT(0);
                             
-                    }
+                    }*/
                     if (appData.mouseButton[0] == MOUSE_BUTTON_STATE_RELEASED)
                     {
-                        appData.xCoordinate = convert_to_m(mx);
-                        appData.yCoordinate = convert_to_m(my);
+                        /*short a=convert_to_m(mx);
+                        a=convert_to_m(my);
+                        convert_to_m(a);*/
+                        appData.xCoordinate = 0;//convert_to_m(mx);
+                        appData.yCoordinate = 0;//convert_to_m(my);
                         LATAbits.LATA4=0;
                     }
                     else

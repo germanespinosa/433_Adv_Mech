@@ -229,4 +229,4 @@ build/pic32mx_usb_sk2_int_dyn/production/_ext/1360937237/app.o:  \
  C:/microchip/harmony/v1_07_01/framework/usb/usb_hid.h  \
 ../src/app.h  \
  ../src/mouse.h  \
-../src/i2c.h 
+../src/imu.h 

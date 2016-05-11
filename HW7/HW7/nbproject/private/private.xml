@@ -3,9 +3,10 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/433/433_Adv_Mech/HW6/main.c</file>
-            <file>file:/D:/433/433_Adv_Mech/HW7/src/i2c.c</file>
-            <file>file:/D:/433/433_Adv_Mech/HW7/src/app.c</file>
+            <file>file:/D:/433/433_Adv_Mech/HW4/i2c.c</file>
+            <file>file:/D:/433/433_Adv_Mech/HW4/pinexp.c</file>
+            <file>file:/D:/433/433_Adv_Mech/HW4/main.c</file>
+            <file>file:/D:/433/433_Adv_Mech/HW4/spi.c</file>
         </group>
     </open-files>
 </project-private>
