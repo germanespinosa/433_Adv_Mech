@@ -4,6 +4,10 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <itemPath>../timer/timer.h</itemPath>
+      <itemPath>../i2c/i2c.h</itemPath>
+      <itemPath>../pinexp/pinexp.h</itemPath>
+      <itemPath>../spi/spi.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -13,9 +17,10 @@
                    displayName="Source Files"
                    projectFiles="true">
       <itemPath>main.c</itemPath>
-      <itemPath>spi.c</itemPath>
-      <itemPath>i2c.c</itemPath>
-      <itemPath>pinexp.c</itemPath>
+      <itemPath>../timer/timer.c</itemPath>
+      <itemPath>../i2c/i2c.c</itemPath>
+      <itemPath>../pinexp/pinexp.c</itemPath>
+      <itemPath>../spi/spi.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -25,6 +30,10 @@
   </logicalFolder>
   <sourceRootList>
     <Elem>.</Elem>
+    <Elem>../timer</Elem>
+    <Elem>../i2c</Elem>
+    <Elem>../pinexp</Elem>
+    <Elem>../spi</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -189,6 +198,7 @@
         <property key="UART1" value="true"/>
         <property key="UART2" value="true"/>
         <property key="USB" value="true"/>
+        <property key="firmware.download.all" value="false"/>
         <property key="hwtoolclock.frcindebug" value="false"/>
         <property key="memories.aux" value="false"/>
         <property key="memories.bootflash" value="true"/>

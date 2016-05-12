@@ -11,6 +11,7 @@
 #define _DISABLE_OPENADC10_CONFIGPORT_WARNING
 #include <plib.h>
 #include <math.h>
+#include "../spi/spi.h"
 
 //#define __delay_ms(x) _delay((unsigned long)((x)*(_XTAL_FREQ/4000.0)))
 
@@ -59,10 +60,11 @@ void set_voltage (unsigned short channel, unsigned char voltage)
     //unsigned short o2= 0b0011111111110000;
     o += (channel && 1) << 15;
     o += voltage << 4;
-    SPI_io_short(o);
+    CS = 0;
+    spi_write((unsigned char *) &o,2);
+    CS = 1;
+    
 }
-
-unsigned char i2cData[4] = {0x98,0x01,0xAA};
 
 int main(int argc, char** argv) {
     __builtin_mtc0(_CP0_CONFIG, _CP0_CONFIG_SELECT, 0xa4210583);
@@ -79,65 +81,71 @@ int main(int argc, char** argv) {
     BMXCONbits.BMXWSDRM = 0x0;
     INTCONbits.MVEC = 0x1;
     DDPCONbits.JTAGEN = 0;
+    SPI_init();
     __builtin_enable_interrupts();
     unsigned char i=0;
     LATAbits.LATA4 = 0;
 
+    set_voltage(0,255);
+    set_voltage(1,0);
+
+    
     pinexp_start(0b00000000/*all out*/,PINEX_SLAVE_ADDR1);
-    pinexp_start(0b00001111/*all in*/,PINEX_SLAVE_ADDR2);
+    pinexp_start(0b00000001/*all in*/,PINEX_SLAVE_ADDR2);
     
     unsigned char o=0;
 
     _CP0_SET_COUNT(0);
-    while (_CP0_GET_COUNT()<24000000){;}
+    while (_CP0_GET_COUNT()<1000000){;}
     o=pinexp_read(PINEX_SLAVE_ADDR2);
     pinexp_write(0b11111111,PINEX_SLAVE_ADDR1);
 
     _CP0_SET_COUNT(0);
-    while (_CP0_GET_COUNT()<24000000){;}
+    while (_CP0_GET_COUNT()<1000000){;}
     pinexp_write(0b00000000,PINEX_SLAVE_ADDR1);
 
     _CP0_SET_COUNT(0);
-    while (_CP0_GET_COUNT()<24000000){;}
+    while (_CP0_GET_COUNT()<1000000){;}
     pinexp_write(o,PINEX_SLAVE_ADDR1);
     
     _CP0_SET_COUNT(0);
     while (_CP0_GET_COUNT()<24000000){;}
 
-    unsigned short b = 0 ;
-    long t = 1000000; 
+    unsigned char b = 0 ;
+    long t = 3000000; 
     
     
     while (PORTBbits.RB4)
     {
         if (_CP0_GET_COUNT()>t)
         {
-            if (b)
-                b = b << 1;
-            else
-                b=1;
-            
+           
             unsigned char o;
             o=pinexp_read(PINEX_SLAVE_ADDR2);
 
-            //pinexp_write(b,PINEX_SLAVE_ADDR2);
+            if (b && !(o & 1))
+                b = b << 1;
+            else
+                b=1;
 
-            pinexp_write(o<<4,PINEX_SLAVE_ADDR2);
-
-            pinexp_write(o,PINEX_SLAVE_ADDR2);
+            pinexp_write(b,PINEX_SLAVE_ADDR1);
 
             if ((o & 1) || !b)
             {
                 LATAbits.LATA4 = 1;
+                set_voltage(0,255);
+                set_voltage(1,0);
             }
             else
             {
                 LATAbits.LATA4 = 0;
+                set_voltage(0,0);
+                set_voltage(1,255);
             }
             _CP0_SET_COUNT(0);
         }
     }
-/*
+
     while(1) {
         i++;
         float r = (sin( (float)i /255 * 6.28 ) * 128) + 127;
@@ -157,6 +165,6 @@ int main(int argc, char** argv) {
         LATAbits.LATA4 = 0;
         _CP0_SET_COUNT(0);
         while (_CP0_GET_COUNT()<8000000); 
-    }*/
+    }
     return (EXIT_SUCCESS);
 }
