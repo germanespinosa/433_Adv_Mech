@@ -45,17 +45,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=main.c ../timer/timer.c ../i2c/i2c.c ../pinexp/pinexp.c ../spi/spi.c
+SOURCEFILES_QUOTED_IF_SPACED=main.c ../dac/dac.c ../timer/timer.c ../spi/spi.c ../i2c/i2c.c ../pinexp/pinexp.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main.o ${OBJECTDIR}/_ext/2103672266/timer.o ${OBJECTDIR}/_ext/1360925643/i2c.o ${OBJECTDIR}/_ext/903817321/pinexp.o ${OBJECTDIR}/_ext/1360937181/spi.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/main.o.d ${OBJECTDIR}/_ext/2103672266/timer.o.d ${OBJECTDIR}/_ext/1360925643/i2c.o.d ${OBJECTDIR}/_ext/903817321/pinexp.o.d ${OBJECTDIR}/_ext/1360937181/spi.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/main.o ${OBJECTDIR}/_ext/1360922295/dac.o ${OBJECTDIR}/_ext/2103672266/timer.o ${OBJECTDIR}/_ext/1360937181/spi.o ${OBJECTDIR}/_ext/1360925643/i2c.o ${OBJECTDIR}/_ext/903817321/pinexp.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/main.o.d ${OBJECTDIR}/_ext/1360922295/dac.o.d ${OBJECTDIR}/_ext/2103672266/timer.o.d ${OBJECTDIR}/_ext/1360937181/spi.o.d ${OBJECTDIR}/_ext/1360925643/i2c.o.d ${OBJECTDIR}/_ext/903817321/pinexp.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/main.o ${OBJECTDIR}/_ext/2103672266/timer.o ${OBJECTDIR}/_ext/1360925643/i2c.o ${OBJECTDIR}/_ext/903817321/pinexp.o ${OBJECTDIR}/_ext/1360937181/spi.o
+OBJECTFILES=${OBJECTDIR}/main.o ${OBJECTDIR}/_ext/1360922295/dac.o ${OBJECTDIR}/_ext/2103672266/timer.o ${OBJECTDIR}/_ext/1360937181/spi.o ${OBJECTDIR}/_ext/1360925643/i2c.o ${OBJECTDIR}/_ext/903817321/pinexp.o
 
 # Source Files
-SOURCEFILES=main.c ../timer/timer.c ../i2c/i2c.c ../pinexp/pinexp.c ../spi/spi.c
+SOURCEFILES=main.c ../dac/dac.c ../timer/timer.c ../spi/spi.c ../i2c/i2c.c ../pinexp/pinexp.c
 
 
 CFLAGS=
@@ -100,11 +100,23 @@ ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${RM} ${OBJECTDIR}/main.o 
 	@${FIXDEPS} "${OBJECTDIR}/main.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/main.o.d" -o ${OBJECTDIR}/main.o main.c     
 	
+${OBJECTDIR}/_ext/1360922295/dac.o: ../dac/dac.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/_ext/1360922295" 
+	@${RM} ${OBJECTDIR}/_ext/1360922295/dac.o.d 
+	@${RM} ${OBJECTDIR}/_ext/1360922295/dac.o 
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1360922295/dac.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1360922295/dac.o.d" -o ${OBJECTDIR}/_ext/1360922295/dac.o ../dac/dac.c     
+	
 ${OBJECTDIR}/_ext/2103672266/timer.o: ../timer/timer.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/_ext/2103672266" 
 	@${RM} ${OBJECTDIR}/_ext/2103672266/timer.o.d 
 	@${RM} ${OBJECTDIR}/_ext/2103672266/timer.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/2103672266/timer.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/2103672266/timer.o.d" -o ${OBJECTDIR}/_ext/2103672266/timer.o ../timer/timer.c     
+	
+${OBJECTDIR}/_ext/1360937181/spi.o: ../spi/spi.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/_ext/1360937181" 
+	@${RM} ${OBJECTDIR}/_ext/1360937181/spi.o.d 
+	@${RM} ${OBJECTDIR}/_ext/1360937181/spi.o 
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1360937181/spi.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1360937181/spi.o.d" -o ${OBJECTDIR}/_ext/1360937181/spi.o ../spi/spi.c     
 	
 ${OBJECTDIR}/_ext/1360925643/i2c.o: ../i2c/i2c.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/_ext/1360925643" 
@@ -118,12 +130,6 @@ ${OBJECTDIR}/_ext/903817321/pinexp.o: ../pinexp/pinexp.c  nbproject/Makefile-${C
 	@${RM} ${OBJECTDIR}/_ext/903817321/pinexp.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/903817321/pinexp.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/903817321/pinexp.o.d" -o ${OBJECTDIR}/_ext/903817321/pinexp.o ../pinexp/pinexp.c     
 	
-${OBJECTDIR}/_ext/1360937181/spi.o: ../spi/spi.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/_ext/1360937181" 
-	@${RM} ${OBJECTDIR}/_ext/1360937181/spi.o.d 
-	@${RM} ${OBJECTDIR}/_ext/1360937181/spi.o 
-	@${FIXDEPS} "${OBJECTDIR}/_ext/1360937181/spi.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG -D__MPLAB_DEBUGGER_PK3=1 -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1360937181/spi.o.d" -o ${OBJECTDIR}/_ext/1360937181/spi.o ../spi/spi.c     
-	
 else
 ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}" 
@@ -131,11 +137,23 @@ ${OBJECTDIR}/main.o: main.c  nbproject/Makefile-${CND_CONF}.mk
 	@${RM} ${OBJECTDIR}/main.o 
 	@${FIXDEPS} "${OBJECTDIR}/main.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/main.o.d" -o ${OBJECTDIR}/main.o main.c     
 	
+${OBJECTDIR}/_ext/1360922295/dac.o: ../dac/dac.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/_ext/1360922295" 
+	@${RM} ${OBJECTDIR}/_ext/1360922295/dac.o.d 
+	@${RM} ${OBJECTDIR}/_ext/1360922295/dac.o 
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1360922295/dac.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1360922295/dac.o.d" -o ${OBJECTDIR}/_ext/1360922295/dac.o ../dac/dac.c     
+	
 ${OBJECTDIR}/_ext/2103672266/timer.o: ../timer/timer.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/_ext/2103672266" 
 	@${RM} ${OBJECTDIR}/_ext/2103672266/timer.o.d 
 	@${RM} ${OBJECTDIR}/_ext/2103672266/timer.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/2103672266/timer.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/2103672266/timer.o.d" -o ${OBJECTDIR}/_ext/2103672266/timer.o ../timer/timer.c     
+	
+${OBJECTDIR}/_ext/1360937181/spi.o: ../spi/spi.c  nbproject/Makefile-${CND_CONF}.mk
+	@${MKDIR} "${OBJECTDIR}/_ext/1360937181" 
+	@${RM} ${OBJECTDIR}/_ext/1360937181/spi.o.d 
+	@${RM} ${OBJECTDIR}/_ext/1360937181/spi.o 
+	@${FIXDEPS} "${OBJECTDIR}/_ext/1360937181/spi.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1360937181/spi.o.d" -o ${OBJECTDIR}/_ext/1360937181/spi.o ../spi/spi.c     
 	
 ${OBJECTDIR}/_ext/1360925643/i2c.o: ../i2c/i2c.c  nbproject/Makefile-${CND_CONF}.mk
 	@${MKDIR} "${OBJECTDIR}/_ext/1360925643" 
@@ -148,12 +166,6 @@ ${OBJECTDIR}/_ext/903817321/pinexp.o: ../pinexp/pinexp.c  nbproject/Makefile-${C
 	@${RM} ${OBJECTDIR}/_ext/903817321/pinexp.o.d 
 	@${RM} ${OBJECTDIR}/_ext/903817321/pinexp.o 
 	@${FIXDEPS} "${OBJECTDIR}/_ext/903817321/pinexp.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/903817321/pinexp.o.d" -o ${OBJECTDIR}/_ext/903817321/pinexp.o ../pinexp/pinexp.c     
-	
-${OBJECTDIR}/_ext/1360937181/spi.o: ../spi/spi.c  nbproject/Makefile-${CND_CONF}.mk
-	@${MKDIR} "${OBJECTDIR}/_ext/1360937181" 
-	@${RM} ${OBJECTDIR}/_ext/1360937181/spi.o.d 
-	@${RM} ${OBJECTDIR}/_ext/1360937181/spi.o 
-	@${FIXDEPS} "${OBJECTDIR}/_ext/1360937181/spi.o.d" $(SILENT) -rsi ${MP_CC_DIR}../  -c ${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -MMD -MF "${OBJECTDIR}/_ext/1360937181/spi.o.d" -o ${OBJECTDIR}/_ext/1360937181/spi.o ../spi/spi.c     
 	
 endif
 

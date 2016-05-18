@@ -1,4 +1,3 @@
 build/default/production/main.o:  \
 main.c  \
-../spi/spi.h  \
- ../spi/../timer/timer.h 
+HW4.h 
