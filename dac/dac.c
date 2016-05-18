@@ -7,13 +7,6 @@ unsigned dac_init()
     return spi_init();
 }
 
-// write len bytes to the ram, starting at the address addr
-unsigned short spi_io_short(unsigned short o) 
-{
-    unsigned char buffer[2] = {(o & 0xFF00) >> 8, o};
-    return spi_write(buffer,2);
-}
-
 unsigned set_voltage (unsigned short channel, unsigned char voltage)
 {
     unsigned char buffer[2] = {

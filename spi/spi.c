@@ -39,3 +39,13 @@ unsigned spi_init()
     }
     return started;
 }
+
+
+// write len bytes to the ram, starting at the address addr
+unsigned spi_io_short(unsigned short *o) 
+{
+    unsigned char buffer[2] = {(*o & 0xFF00) >> 8, *o};
+    unsigned r = spi_write(buffer,2);
+    *o= (buffer[0] << 8) + buffer[1];
+    return r;
+}
