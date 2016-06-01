@@ -3,10 +3,17 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/433/433_Adv_Mech/HW4/i2c.c</file>
-            <file>file:/D:/433/433_Adv_Mech/HW4/pinexp.c</file>
-            <file>file:/D:/433/433_Adv_Mech/HW4/main.c</file>
-            <file>file:/D:/433/433_Adv_Mech/HW4/spi.c</file>
+            <file>file:/D:/433/433_Adv_Mech/spi/spi.h</file>
+            <file>file:/D:/433/433_Adv_Mech/HW5/main.c</file>
+            <file>file:/D:/433/433_Adv_Mech/ROBOT/main.c</file>
+            <file>file:/D:/433/433_Adv_Mech/lcd/lcd.h</file>
+            <file>file:/D:/433/433_Adv_Mech/timer/timer.c</file>
+            <file>file:/D:/433/433_Adv_Mech/lcd/lcd.c</file>
+            <file>file:/D:/433/433_Adv_Mech/spi/spi.c</file>
+            <file>file:/D:/433/433_Adv_Mech/ROBOT/uart.c</file>
+            <file>file:/D:/433/433_Adv_Mech/HW5/HW5.h</file>
+            <file>file:/D:/433/433_Adv_Mech/ROBOT/ROBOT.h</file>
+            <file>file:/D:/433/433_Adv_Mech/timer/timer.h</file>
         </group>
     </open-files>
 </project-private>

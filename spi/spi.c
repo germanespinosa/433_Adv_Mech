@@ -30,7 +30,7 @@ unsigned spi_init()
     static unsigned char started = 0;
     if (!started)
     {
-        RPB15Rbits.RPB15R = 0b0101;  // assigns clock to pin 15 
+        //  // assigns clock to pin 15 
         RPA1Rbits.RPA1R = 0b0011;    // assigns  SDO1 to pin A1
         SPI1CONbits.CKE = 1;      // data changes when clock goes from hi to lo (since CKP is 0)
         SPI1CONbits.MSTEN = 1;    // master operation

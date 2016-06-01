@@ -1,4 +1,4 @@
-#include "HW5.h"
+#include "ROBOT.h"
 
 void PWM1_Duty(int Pwm)    
 {
@@ -72,6 +72,9 @@ int main(int argc, char** argv) {
     INTCONbits.MVEC = 0x1;
     DDPCONbits.JTAGEN = 0;
     __builtin_enable_interrupts();
+    uart_init();
+    return 0;
+    
     start_PWM();
     
     lcd_start();
